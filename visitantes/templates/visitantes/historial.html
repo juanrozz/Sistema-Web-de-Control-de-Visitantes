@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Visitantes</title>
+</head>
+<body>
+    <h1>Historial de Registros</h1>
+    <p><a href="{% url 'visitantes:index' %}">Volver al inicio</a></p>
+
+    <h2>Aún sin marcar salida</h2>
+    {% if activos %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Nombre</th>
+                <th>Origen</th>
+                <th>Motivo</th>
+                <th>Fecha de Ingreso</th>
+            </tr>
+            {% for visitante in activos %}
+            <tr>
+                <td>{{ visitante.nombre }}</td>
+                <td>{{ visitante.origen }}</td>
+                <td>{{ visitante.motivo }}</td>
+                <td>{{ visitante.fecha_ingreso }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No hay visitantes activos en este momento.</p>
+    {% endif %}
+
+    <h2>Historial de Salidas</h2>
+    {% if inactivos %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Nombre</th>
+                <th>Origen</th>
+                <th>Motivo</th>
+                <th>Fecha de Ingreso</th>
+                <th>Fecha de Salida</th>
+            </tr>
+            {% for visitante in inactivos %}
+            <tr>
+                <td>{{ visitante.nombre }}</td>
+                <td>{{ visitante.origen }}</td>
+                <td>{{ visitante.motivo }}</td>
+                <td>{{ visitante.fecha_ingreso }}</td>
+                <td>{{ visitante.fecha_salida }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No hay registros de salida en el historial.</p>
+    {% endif %}
+</body>
+</html>

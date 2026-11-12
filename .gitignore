@@ -1,0 +1,24 @@
+# Otras aplicaciones que NO se deben subir a este repositorio
+loro/
+perros/
+polls/
+propuestas_universitarias/
+
+# Archivos comprimidos y base de datos local
+*.zip
+db.sqlite3
+
+# Entornos virtuales y archivos compilados de Python
+tutorial-env/
+venv/
+env/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración privada y editor
+.env
+.vscode/
+.idea/
+.DS_Store

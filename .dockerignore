@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.git/
+tutorial-env/
+venv/
+env/

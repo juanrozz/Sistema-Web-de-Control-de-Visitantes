@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Visitante</title>
+</head>
+<body>
+    <h2>Editar Visitante</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label>Nombre:</label><br>
+        <input type="text" name="nombre" value="{{ visitante.nombre }}" required><br><br>
+
+        <label>Origen / Empresa:</label><br>
+        <input type="text" name="origen" value="{{ visitante.origen }}" required><br><br>
+
+        <label>Motivo:</label><br>
+        <textarea name="motivo" required>{{ visitante.motivo }}</textarea><br><br>
+
+        <label>Sede:</label><br>
+        <select name="sede" required>
+            <option value="Norte" {% if visitante.sede == 'Norte' %}selected{% endif %}>Sede Norte</option>
+            <option value="Sur" {% if visitante.sede == 'Sur' %}selected{% endif %}>Sede Sur</option>
+            <option value="Centro" {% if visitante.sede == 'Centro' %}selected{% endif %}>Sede Centro</option>
+        </select><br><br>
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    <p><a href="{% url 'visitantes:index' %}">Volver</a></p>
+</body>
+</html>
