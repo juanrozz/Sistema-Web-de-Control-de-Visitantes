@@ -11,7 +11,7 @@ from .models import Visitante
 
 class CustomLoginView(LoginView):
     template_name = 'visitantes/login.html'
-    redirect_authenticated_user = True  # Si ya inició sesión, lo manda directo a su panel
+    redirect_authenticated_user = True  
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -43,7 +43,7 @@ def index(request):
             sede=sede,
             motivo=motivo,
             activo=True,
-            registrado_por=request.user,  # Guarda qué celador lo dejó entrar
+            registrado_por=request.user, 
         )
         return redirect('visitantes:index')
 
@@ -53,7 +53,7 @@ def index(request):
         'visitantes/index.html',
         {
             'lista_visitantes': lista_visitantes,
-            'sedes': Visitante.SEDES,  # Enviamos las sedes al HTML
+            'sedes': Visitante.SEDES,  
         }
     )
 
@@ -99,26 +99,31 @@ def historial(request):
         {'activos': activos, 'inactivos': inactivos},
     )
 
+
 @login_required
 def reporte_ia(request):
-    visitantes = Visitante.objects.all()
+    solo_activos = Visitante.objects.filter(activo=True)
+    total_historico = Visitante.objects.count()
+
     datos_enviar = [
         {
             'nombre': v.nombre,
             'origen': v.origen,
             'sede': v.get_sede_display(),
             'motivo': v.motivo,
-            'activo': v.activo,
+            'fecha_ingreso': v.fecha_ingreso.strftime('%Y-%m-%d %H:%M'),
         }
-        for v in visitantes
+        for v in solo_activos
     ]
 
     analisis_ia = "No se pudo conectar con el microservicio de IA."
     try:
-        # 'node_ia' es el nombre del servicio en docker-compose.yml
         respuesta = requests.post(
             'http://node_ia:3000/api/analizar',
-            json={'visitantes': datos_enviar},
+            json={
+                'visitantes': datos_enviar,
+                'total_historico': total_historico,
+            },
             timeout=20
         )
         if respuesta.status_code == 200:

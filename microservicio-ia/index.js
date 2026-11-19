@@ -72,21 +72,24 @@ app.get('/api/health', (req, res) => {
  *         description: Análisis generado por IA exitosamente
  */
 app.post('/api/analizar', async (req, res) => {
-  const { visitantes } = req.body;
-  console.log('Petición recibida desde Django. Visitantes:', visitantes?.length || 0);
+  const { visitantes, total_historico } = req.body;
+  const activosCount = visitantes ? visitantes.length : 0;
+  const historicoCount = total_historico || activosCount;
 
-  if (!visitantes || visitantes.length === 0) {
+  if (activosCount === 0) {
     return res.json({
-      analisis: 'No hay visitantes registrados para analizar en este momento.',
+      analisis: `Informe de Relevo: Se registran ${historicoCount} ingresos en el historial, pero actualmente hay 0 visitantes adentro de las instalaciones. Sin novedades de seguridad.`,
     });
   }
 
   try {
-    const prompt = `Actúa como un jefe de seguridad universitaria. Analiza esta lista de visitantes en formato JSON y entrega un resumen ejecutivo (máximo 5 líneas):
-1. Indica el total de visitantes, cuántos siguen activos y la sede con mayor movimiento.
-2. Si detectas motivos sospechosos o incoherentes (ej. objetos peligrosos, paquetes sin remitente, ingreso a zonas restringidas sin permiso, datos falsos), emite una ALERTA CRÍTICA DE SEGURIDAD nombrando explícitamente al visitante sospechoso, su empresa de origen, la sede donde ingresó y el motivo exacto. Si todo es normal, indica que no hay novedades críticas.
+    const horaActual = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+    const prompt = `Actúa como un jefe de seguridad universitaria. La hora actual es ${horaActual}. El historial total tiene ${historicoCount} registros, y actualmente siguen ADENTRO de las instalaciones estas ${activosCount} personas:
+    ${JSON.stringify(visitantes)}
 
-Datos de portería: ${JSON.stringify(visitantes)}`;
+Entrega un informe de relevo de turno (máximo 4 líneas):
+1. Indica cuántos visitantes siguen adentro frente al total histórico y qué sede tiene mayor movimiento actual.
+2. Evalúa si alguno de estos visitantes activos presenta anomalías (permanencia excesiva para entregas/domicilios o incoherencia entre empresa de origen y motivo). Nombra al visitante y su sede si hay novedad, o confirma que todo está en orden.`;
 
     const payload = JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
@@ -146,26 +149,25 @@ Datos de portería: ${JSON.stringify(visitantes)}`;
   } catch (error) {
     console.error('Fallo o saturación en Gemini, usando análisis de respaldo:', error.message);
 
-    const activos = visitantes.filter((v) => v.activo).length;
     const sedes = [...new Set(visitantes.map((v) => v.sede))].join(', ');
-    const sospechosos = visitantes.filter((v) =>
-      /sospechoso|arma|paquete|sin permiso|restringid|bomba|cuchillo|droga/i.test(v.motivo)
+    const domicilios = visitantes.filter((v) =>
+      /pizza|domicilio|entrega|paquete|rappi|servientrega/i.test(`${v.origen} ${v.motivo}`)
     );
 
-    let alerta = 'Sin alertas críticas de seguridad.';
-    if (sospechosos.length > 0) {
-      const detalles = sospechosos
-        .map((s) => `${s.nombre} (Sede: ${s.sede} - Motivo: "${s.motivo}")`)
+    let novedad = 'Sin alertas críticas de seguridad en los visitantes activos.';
+    if (domicilios.length > 0) {
+      const lista = domicilios
+        .map((d) => `${d.nombre} (${d.origen} - ${d.sede}, ingresó: ${d.fecha_ingreso})`)
         .join('; ');
-      alerta = `ALERTA CRÍTICA: Revisar inmediatamente a -> ${detalles}.`;
+      novedad = `Novedad de Permanencia: Verificar salida pendiente de entrega rápida -> ${lista}.`;
     }
 
     return res.json({
-      analisis: `Resumen de Seguridad: Se registran ${visitantes.length} visitantes en total (${activos} activos). Sedes con actividad: ${sedes}. ${alerta}`,
+      analisis: `Informe de Relevo: Hay ${activosCount} visitante(s) actualmente adentro (de ${historicoCount} registros totales). Sedes activas: ${sedes}. ${novedad}`,
     });
   }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Microservicio Node.js corriendo en http://0.0.0:${PORT}`);
+  console.log(`Microservicio Node.js corriendo en http://0.0.0.0:${PORT}`);
 });
