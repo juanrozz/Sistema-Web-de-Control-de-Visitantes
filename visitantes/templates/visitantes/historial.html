@@ -5,6 +5,17 @@
     <title>Historial de Visitantes</title>
 </head>
 <body>
+    <div style="background-color: #f0f4f8; padding: 15px; border-left: 4px solid #0066cc; margin-bottom: 20px;">
+        <h3>Auditoría Inteligente (Microservicio Node.js + IA)</h3>
+        <a href="{% url 'visitantes:reporte_ia' %}">
+            <button type="button">Generar Análisis con IA</button>
+        </a>
+        {% if analisis_ia %}
+            <p style="margin-top: 10px;"><strong>Resultado de la IA:</strong> {{ analisis_ia }}</p>
+        {% endif %}
+    </div>
+
+
     <h1>Historial de Registros</h1>
     <p><a href="{% url 'visitantes:index' %}">Volver al inicio</a></p>
 

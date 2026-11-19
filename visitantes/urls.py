@@ -15,5 +15,6 @@ urlpatterns = [
     path('porteria/', views.index, name='index'),
     path('porteria/<int:visitante_id>/', views.detalle, name='detalle'),
     path('porteria/historial/', views.historial, name='historial'),
+    path('porteria/reporte-ia/', views.reporte_ia, name='reporte_ia'),
     path('porteria/<int:visitante_id>/desactivar/', views.desactivar, name='desactivar'),
 ]

@@ -1,0 +1,16 @@
+{
+  "name": "microservicio-ia-visitantes",
+  "version": "1.0.0",
+  "description": "Microservicio Node.js con Swagger e IA Generativa para auditoría de visitantes",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

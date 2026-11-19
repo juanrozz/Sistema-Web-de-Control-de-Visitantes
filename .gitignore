@@ -22,3 +22,7 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+
+# Dependencias de Node.js
+node_modules/
+microservicio-ia/node_modules/

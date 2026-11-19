@@ -1,3 +1,5 @@
+import requests
+from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
@@ -95,4 +97,45 @@ def historial(request):
         request,
         'visitantes/historial.html',
         {'activos': activos, 'inactivos': inactivos},
+    )
+
+@login_required
+def reporte_ia(request):
+    visitantes = Visitante.objects.all()
+    datos_enviar = [
+        {
+            'nombre': v.nombre,
+            'origen': v.origen,
+            'sede': v.get_sede_display(),
+            'motivo': v.motivo,
+            'activo': v.activo,
+        }
+        for v in visitantes
+    ]
+
+    analisis_ia = "No se pudo conectar con el microservicio de IA."
+    try:
+        # 'node_ia' es el nombre del servicio en docker-compose.yml
+        respuesta = requests.post(
+            'http://node_ia:3000/api/analizar',
+            json={'visitantes': datos_enviar},
+            timeout=20
+        )
+        if respuesta.status_code == 200:
+            analisis_ia = respuesta.json().get('analisis', '')
+        else:
+            analisis_ia = f"Error del microservicio: {respuesta.text}"
+    except Exception as e:
+        analisis_ia = f"Error de conexión con Node.js: {str(e)}"
+
+    activos = Visitante.objects.filter(activo=True).order_by('-fecha_ingreso')
+    inactivos = Visitante.objects.filter(activo=False).order_by('-fecha_salida')
+    return render(
+        request,
+        'visitantes/historial.html',
+        {
+            'activos': activos,
+            'inactivos': inactivos,
+            'analisis_ia': analisis_ia,
+        },
     )
