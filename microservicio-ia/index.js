@@ -23,6 +23,10 @@ const swaggerOptions = {
     },
     servers: [
       {
+        url: 'https://onrender.com',
+        description: 'Servidor en Producción (Render)',
+      },
+      {
         url: 'http://localhost:3000',
         description: 'Servidor Local / Contenedor Docker',
       },

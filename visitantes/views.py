@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from .models import Visitante
-
+import os
 
 class CustomLoginView(LoginView):
     template_name = 'visitantes/login.html'
@@ -117,9 +117,13 @@ def reporte_ia(request):
     ]
 
     analisis_ia = "No se pudo conectar con el microservicio de IA."
+    url_microservicio = os.environ.get(
+        'NODE_IA_URL',
+        'https://onrender.com'
+    )
     try:
         respuesta = requests.post(
-            'http://node_ia:3000/api/analizar',
+            url_microservicio,
             json={
                 'visitantes': datos_enviar,
                 'total_historico': total_historico,
