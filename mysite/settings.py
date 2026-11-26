@@ -33,7 +33,6 @@ CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
 # Application definition
 
 INSTALLED_APPS = [
-    "polls.apps.PollsConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
